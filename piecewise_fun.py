@@ -1,4 +1,4 @@
-from exceptions import WrongType, RangeError, FunctionFormat, RangeInconsistency, OutOfRange, ListIndexOutOFRange
+from exceptions import WrongType, RangeError, FunctionFormat, RangeInconsistency, OutOfRange, ListIndexOutOFRange, FloatIndex
 import numpy as np
 from matplotlib import pyplot as plt
 from itertools import cycle
@@ -142,16 +142,19 @@ class PiecewiseFunction:
         return pos
 
     def remove_fun(self, index:int):
+        if type(index) != int: raise FloatIndex(index)
         fl_len=len(self.__function_list)
         if index>=fl_len: raise ListIndexOutOFRange(index,fl_len)
         del self.__function_list[index]
 
     def get_fun(self, index:int) -> PieceFunction:
+        if type(index) != int: raise FloatIndex(index)
         fl_len=len(self.__function_list)
         if index>=fl_len: raise ListIndexOutOFRange(index,fl_len)
         return self.__function_list[index]
 
     def plot_fun(self, index:int):
+        if type(index) != int: raise FloatIndex(index)
         fl_len=len(self.__function_list)
         if index>=fl_len: raise ListIndexOutOFRange(index,fl_len)
         self.__function_list[index].plot()

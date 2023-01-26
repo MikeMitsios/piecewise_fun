@@ -32,6 +32,11 @@ class RangeInconsistency(ValueError):
         self.message = "function_list item [" + str(index1) + "] <" + item1 + "> and [" + str(index2) + "] <" + item2 + "> must not share values of their domains"
         super().__init__(self.message)
 
+class FloatIndex(TypeError):
+
+    def __init__(self, index):
+        self.message = "Index can only be integer, given index = " + str(index)
+        super().__init__(self.message)
 
 class ListIndexOutOFRange(IndexError):
 

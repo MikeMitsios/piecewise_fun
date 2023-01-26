@@ -1,6 +1,9 @@
 import re
 
-math_function_regex=re.compile("(?:[0-9-+*/()x]|pi|e)+") #a simple regex that represent simple function format for x parameter
+# A simple regex that allows specific characters for function format
+# wanted to avoid the use of **. In this way a Polynomial function cannot be formed
+math_function_regex=re.compile("(?: ?[0-9-+/()x]| ?pi| ?e| ?\*(?: ?[0-9-+/()x]|pi|e))+") 
+#math_function_regex=re.compile(" ?-?(\d|x)( ?(?:[-+*/]) ?(\d|x))+") 
 
 colorstring = 'bgkry'
 
