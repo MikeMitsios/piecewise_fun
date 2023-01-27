@@ -31,9 +31,9 @@ def random_piecewise_funct(param_type:type, fun_number:int, start=0, max_limit=1
         if fun_type == "random":
             f_type = choice(["constant","linear"])
         if f_type == "constant":
-            func=str(a)
+            func = str(a)
         elif f_type == "linear":
-            func=str(a) + "*x+" + str(b)
+            func = str(a) + "*x+" + str(b)
         else:
             raise ValueError("This type of function is supported yet")
         fun_range = rfun(1, max_limit)

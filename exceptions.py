@@ -18,13 +18,11 @@ class RangeError(ValueError):
         self.message = "start(" + str(start) + ") should be less than or equal to end(" + str(end) + ")"
         super().__init__(self.message)
 
-
 class FunctionFormat(ValueError):
 
     def __init__(self, fun):
         self.message = "Function formula " + str(fun) + " must not include other parameter except x and must have correct syntax"
         super().__init__(self.message)
-
 
 class RangeInconsistency(ValueError):
 

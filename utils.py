@@ -20,8 +20,8 @@ def binary_search(arr, x: int):
         else:
             if arr[mid].start < x < arr[mid].end:
                 return mid
-            elif arr[mid].start == x:
-                if arr[mid].equal[0]: # If x is a boarder we have to ensure that if within functions domain
+            elif arr[mid].start == x: # If x is a boarder we have to ensure that is within functions domain
+                if arr[mid].equal[0]: 
                     return mid
                 else:
                     high = mid - 1
