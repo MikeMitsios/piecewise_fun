@@ -22,7 +22,7 @@ class RangeError(ValueError):
 class FunctionFormat(ValueError):
 
     def __init__(self, fun):
-        self.message = "Function formula " + str(fun) + " must not include other parameter except x"
+        self.message = "Function formula " + str(fun) + " must not include other parameter except x and must have correct syntax"
         super().__init__(self.message)
 
 
@@ -43,3 +43,8 @@ class ListIndexOutOFRange(IndexError):
     def __init__(self, index, len):
         self.message = "List index (" + str(index) + ") is out of range of PiecewiseFunction (len = " + str(len) + ")"
         super().__init__(self.message)
+
+class EmptyFunction(ValueError):
+
+    def __init__(self):
+        super().__init__("PiecewiseFunction do not have any PieceFunctions. Is empty []")

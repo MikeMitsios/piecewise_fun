@@ -5,7 +5,7 @@ import re
 math_function_regex=re.compile("(?: ?[0-9-+/()x]| ?pi| ?e| ?\*(?: ?[0-9-+/()x]|pi|e))+") 
 #math_function_regex=re.compile(" ?-?(\d|x)( ?(?:[-+*/]) ?(\d|x))+") 
 
-colorstring = 'bgkry'
+colorstring = 'bgkry' # A string for color cycle
 
 def binary_search(arr, x: int):
     low = 0
@@ -18,10 +18,10 @@ def binary_search(arr, x: int):
         elif arr[mid].start > x:
             high = mid - 1
         else:
-            if arr[mid].start < x and x < arr[mid].end:
+            if arr[mid].start < x < arr[mid].end:
                 return mid
             elif arr[mid].start == x:
-                if arr[mid].equal[0]: #if x is a boarder we have to ensure that if within functions domain
+                if arr[mid].equal[0]: # If x is a boarder we have to ensure that if within functions domain
                     return mid
                 else:
                     high = mid - 1

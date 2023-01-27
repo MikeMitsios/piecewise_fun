@@ -1,4 +1,4 @@
-from exceptions import WrongType, RangeError, FunctionFormat, RangeInconsistency, OutOfRange, ListIndexOutOFRange, FloatIndex
+from exceptions import WrongType, RangeError, FunctionFormat, RangeInconsistency, OutOfRange, ListIndexOutOFRange, FloatIndex, EmptyFunction
 import numpy as np
 from matplotlib import pyplot as plt
 from itertools import cycle
@@ -13,8 +13,8 @@ class PieceFunction:
         end: The x where the function ends
         function: The format of the function (string)
         equal: A boolean tuple that shows whether the start and end of the field are included
-    Functions:
-        __input_verification: This functions check if the given arguments have the right type.
+    Methods:
+        __input_verification: This method check if the given arguments have the right type.
         eval: The evaluation of x for the given a function.
         plot: Returns the chart of the function.
         get_min: Finds the minimum value of the function. Because we have only constant and linear function we check only the edges of the domain.
@@ -28,6 +28,8 @@ class PieceFunction:
         self.end: float = end
         self.function: str = function
         self.equal: tuple = equal
+        self.min = min(self.eval(self.start, True), self.eval(self.end, True))
+        self.max = max(self.eval(self.start, True), self.eval(self.end, True))
 
     def __input_verification(self, start:float, end:float, equal:tuple, function:str):
         if not isinstance(start, (int,float)): raise WrongType("start", type(start), "int/float")
@@ -37,30 +39,38 @@ class PieceFunction:
             raise WrongType("equal", type(equal), "tuple(bool, bool)")
         if not isinstance(function, str): raise WrongType("function", type(end), "str")
         if not math_function_regex.match(function): raise FunctionFormat(function)
+        try:
+            e=eval(function, {"x": start}) # A small check before creation 
+        except SyntaxError:
+            raise FunctionFormat(function)
 
-    def eval(self, x:float, plot_mode:bool=False) -> float:
+    def eval(self, x:float, plot_mode=False, verbose=False) -> float:
         if plot_mode: return eval(self.function, {"x": x})
-        if (x == self.end and self.equal[1]) or (x < self.end and x > self.start) or (x == self.start and self.equal[0]): #(x < self.end and x > self.start) or
-            return eval(self.function, {"x": x})
+        if (x == self.end and self.equal[1]) or (x < self.end and x > self.start) or (x == self.start and self.equal[0]):
+            value= eval(self.function, {"x": x})
+            if verbose: print("f(" + str(x) + ") = "+str(value)) 
+            return value
         else:
-            raise OutOfRange(x, self.function)        
+            raise OutOfRange(x, self.function)  
 
-    def plot(self, show:bool=True, f_color='red'):
+    def plot(self, show=True, f_color='red'):
         def points_plot(eq, pos):    
             fill_style = 'full' if eq else 'none'                          
             plt.plot(x[pos], y[pos], fillstyle=fill_style, marker='o', color=f_color)    
         x = np.linspace(self.start, self.end, 2)  # 2 points need to represent constant and linear funcs
         y = np.full(x.shape, self.eval(x, True))
+        plt.xlabel("x")
+        plt.ylabel("f(x)")
         plt.plot(x, y, color=f_color)
         points_plot(self.equal[0],0)    # Checks if the start edges is included to the domain
         points_plot(self.equal[1],-1)   # Checks if the end edges is included to the domain
         if show: plt.show()
 
     def get_min(self) -> float:
-        return min(self.eval(self.start, True), self.eval(self.end, True))
+        return self.min
     
     def get_max(self) -> float:
-        return max(self.eval(self.start, True), self.eval(self.end, True))
+        return self.max
 
     def __str__(self) -> str:
         p_start = "[" if self.equal[0] else "("
@@ -78,7 +88,7 @@ class PiecewiseFunction:
 
         Attributes:
             The main attribute in this class is self.__function_list (private). This is the list that contains many PieceFunctions
-        Functions:
+        Methods:
             __input_verification: A type check for the given arguments.
             __ranges_inconsistency: This function checks whether the given functions and their domains do not have any range inconsistency (one domain overlaps another).
             __len__: The size of the list of PieceFunctions.
@@ -114,12 +124,13 @@ class PiecewiseFunction:
     def __len__(self) -> int:
         return len(self.__function_list)
 
-    def eval(self, x:float) -> float:
+    def eval(self, x:float, verbose=False) -> float:
+        if not self.__function_list: raise EmptyFunction
         f_index=binary_search(self.__function_list, x)
         if f_index == -1:
             raise OutOfRange(x, self.__function_list)
         else:
-            return self.__function_list[f_index].eval(x)
+            return self.__function_list[f_index].eval(x, verbose=verbose)
 
     def add_fun(self, fun:PieceFunction):
         if not isinstance(fun, PieceFunction):
@@ -142,29 +153,34 @@ class PiecewiseFunction:
         return pos
 
     def remove_fun(self, index:int):
+        if not self.__function_list: raise EmptyFunction
         if type(index) != int: raise FloatIndex(index)
         fl_len=len(self.__function_list)
         if index>=fl_len: raise ListIndexOutOFRange(index,fl_len)
         del self.__function_list[index]
 
     def get_fun(self, index:int) -> PieceFunction:
+        if not self.__function_list: raise EmptyFunction
         if type(index) != int: raise FloatIndex(index)
         fl_len=len(self.__function_list)
         if index>=fl_len: raise ListIndexOutOFRange(index,fl_len)
         return self.__function_list[index]
 
     def plot_fun(self, index:int):
+        if not self.__function_list: raise EmptyFunction
         if type(index) != int: raise FloatIndex(index)
         fl_len=len(self.__function_list)
         if index>=fl_len: raise ListIndexOutOFRange(index,fl_len)
         self.__function_list[index].plot()
 
     def get_min(self, verbose=False) -> float:
+        if not self.__function_list: raise EmptyFunction
         m = min((f.get_min(), idx) for idx, f in enumerate(self.__function_list))
         if verbose: print("The min value is: " + str(m[0]) + " from <" + str(self.__function_list[m[1]]) + "> PieceFunction")
         return m
     
     def get_max(self, verbose=False) -> float:
+        if not self.__function_list: raise EmptyFunction
         m = max((f.get_max(), idx) for idx, f in enumerate(self.__function_list))
         if verbose: print("The max value is: " + str(m[0]) + " from <" + str(self.__function_list[m[1]]) + "> PieceFunction")
         return m
@@ -176,10 +192,12 @@ class PiecewiseFunction:
         return f_list_str + "]"
 
     def report_f(self):
+        if not self.__function_list: raise EmptyFunction
         print(self)
         self.plot()
 
     def plot(self):
+        if not self.__function_list: raise EmptyFunction
         color_pool= cycle(list(colorstring))  #avoid 2 consecutive functions have the same color
         [f.plot(show=False,f_color=next(color_pool)) for f in self.__function_list]
         plt.show()
